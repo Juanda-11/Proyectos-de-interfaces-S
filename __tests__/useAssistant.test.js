@@ -1,4 +1,5 @@
 import { act, renderHook, waitFor } from '@testing-library/react-native';
+import useAssistant from '../src/hooks/useAssistant';
 
 const mockSpeak = jest.fn();
 const mockStop = jest.fn();
@@ -24,8 +25,6 @@ jest.mock('../src/api/client', () => ({
   requestDiagnosis: (...args) => mockDiagnosis(...args),
   requestChat: (...args) => mockChat(...args),
 }));
-
-import useAssistant from '../src/hooks/useAssistant';
 
 const machine = { typeId: 'boiler', typeLabel: 'Caldera', name: 'Caldera #04' };
 const alert = {
