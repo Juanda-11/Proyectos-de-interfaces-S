@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GRADIENTS, GLOW, COLORS } from '../theme/tokens';
 
 // Badge de estado con degradado neón. Si `pulse` es true, el punto y el halo laten.
-export default function StatusBadge({ label, variant = 'safe', pulse = true }) {
+export default function StatusBadge({ label, variant = 'safe', pulse = true, compact = false }) {
   const anim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -42,10 +42,12 @@ export default function StatusBadge({ label, variant = 'safe', pulse = true }) {
         colors={GRADIENTS[variant]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={styles.pill}
+        style={[styles.pill, compact && styles.pillCompact]}
       >
-        <Animated.View style={[styles.dot, { opacity: dotOpacity }]} />
-        <Text style={styles.text}>{label}</Text>
+        <Animated.View
+          style={[styles.dot, compact && styles.dotCompact, { opacity: dotOpacity }]}
+        />
+        <Text style={[styles.text, compact && styles.textCompact]}>{label}</Text>
       </LinearGradient>
     </View>
   );
@@ -60,6 +62,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 999,
   },
+  pillCompact: { paddingVertical: 4, paddingHorizontal: 9 },
+  dotCompact: { width: 7, height: 7, marginRight: 5 },
+  textCompact: { fontSize: 11 },
   dot: {
     width: 9,
     height: 9,

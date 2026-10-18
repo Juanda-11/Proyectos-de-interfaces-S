@@ -12,14 +12,14 @@ export default function TaskCard({ machine = 'Máquina #04', icon, badge, onPres
       onPress={onPress}
       style={({ pressed }) => [styles.card, pressed && { opacity: 0.7 }]}
     >
-      <View style={{ flex: 1 }}>
+      <View style={styles.top}>
         <Text style={styles.label}>EQUIPO ASIGNADO ⚙</Text>
-        <Text style={styles.machine} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
-          {icon ? `${icon} ` : ''}
-          {machine}
-        </Text>
+        <StatusBadge label={badge.label} variant={badge.variant} pulse={badge.pulse} compact />
       </View>
-      <StatusBadge label={badge.label} variant={badge.variant} pulse={badge.pulse} />
+      <Text style={styles.machine} numberOfLines={1}>
+        {icon ? `${icon} ` : ''}
+        {machine}
+      </Text>
     </Pressable>
   );
 }
@@ -27,16 +27,15 @@ export default function TaskCard({ machine = 'Máquina #04', icon, badge, onPres
 const styles = StyleSheet.create({
   card: {
     width: 270,
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: COLORS.glass,
     borderWidth: 1,
     borderColor: COLORS.glassBorder,
     borderRadius: 24,
     paddingVertical: 10,
     paddingHorizontal: 14,
-    gap: 8,
+    gap: 4,
   },
+  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   label: { color: COLORS.dim, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
-  machine: { color: COLORS.white, fontSize: 20, fontWeight: '900', marginTop: 1 },
+  machine: { color: COLORS.white, fontSize: 20, fontWeight: '900' },
 });
