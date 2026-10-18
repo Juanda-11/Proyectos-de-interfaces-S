@@ -14,6 +14,30 @@ export const warning = () =>
   run(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning));
 export const success = () =>
   run(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success));
-// Patrón de vibración para alerta crítica: 3 pulsos largos
-export const alertVibration = () => run(() => Vibration.vibrate([0, 250, 120, 250, 120, 250]));
-export const stopVibration = () => run(() => Vibration.cancel());
+export const stopVibration = () => {
+  if (Platform.OS === 'web') {
+    try {
+      navigator.vibrate?.(0);
+    } catch (e) {}
+    return;
+  }
+  run(() => Vibration.cancel());
+};
+
+// Patrón según severidad: las alertas críticas vibran más y con más pulsos que las medias.
+const PATTERNS = {
+  medium: [0, 200, 150, 200],
+  high: [0, 250, 120, 250, 120, 250],
+  critical: [0, 400, 100, 400, 100, 400, 100, 400],
+};
+export const alertVibrationFor = (severity) => {
+  const pattern = PATTERNS[severity] ?? PATTERNS.high;
+  if (Platform.OS === 'web') {
+    // Android Chrome sí vibra; en escritorio la API no existe y se ignora.
+    try {
+      navigator.vibrate?.(pattern);
+    } catch (e) {}
+    return;
+  }
+  run(() => Vibration.vibrate(pattern));
+};

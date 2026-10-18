@@ -4,12 +4,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import GradientButton from '../components/GradientButton';
 import { useWorker } from '../context/WorkerContext';
 import { COLORS, GRADIENTS, WATCH_SIZE } from '../theme/tokens';
-import { alertVibration, stopVibration, success, warning } from '../utils/haptics';
+import { alertVibrationFor, stopVibration, success, warning } from '../utils/haptics';
 
 // Alerta entrante de la IA: borde con pulse glow, vibración y dos botones gigantes.
 export default function AlertScreen({ active, onResolve }) {
   const { alert } = useWorker();
-  const tone = alert?.severity === 'medium' ? 'warn' : 'alert';
+  const severity = alert?.severity;
+  const tone = severity === 'medium' ? 'warn' : 'alert';
   const pulse = useRef(new Animated.Value(0)).current;
   const [result, setResult] = useState(null); // null | 'accepted' | 'reported'
 
@@ -21,7 +22,7 @@ export default function AlertScreen({ active, onResolve }) {
       return () => clearTimeout(t);
     }
     warning();
-    alertVibration();
+    alertVibrationFor(severity);
     const loop = Animated.loop(
       Animated.sequence([
         Animated.timing(pulse, { toValue: 1, duration: 600, useNativeDriver: true }),
@@ -33,7 +34,7 @@ export default function AlertScreen({ active, onResolve }) {
       loop.stop();
       stopVibration();
     };
-  }, [active, pulse]);
+  }, [active, pulse, severity]);
 
   const resolveTimer = useRef(null);
   useEffect(() => () => clearTimeout(resolveTimer.current), []);
