@@ -1,9 +1,12 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import HeaderBar from '../components/HeaderBar';
 import ShiftRing from '../components/ShiftRing';
 import TaskCard from '../components/TaskCard';
+import { useWorker } from '../context/WorkerContext';
 import useClock from '../hooks/useClock';
+import useShift from '../hooks/useShift';
+import { shiftRangeLabel } from '../utils/shift';
 
 // Estados posibles de la tarea y cómo se muestran en el badge
 const BADGES = {
@@ -12,14 +15,19 @@ const BADGES = {
   reported: { label: 'REPORTADA', variant: 'alert', pulse: true },
 };
 
-export default function HomeScreen({ taskStatus = 'active', battery = 82 }) {
+// Dashboard: hora, batería, turno real y equipo asignado (ambos configurables).
+export default function HomeScreen({ battery = 82, onOpenConfig }) {
   const time = useClock();
+  const { config, machine, taskStatus } = useWorker();
+  const status = useShift(config.shift);
 
   return (
     <View style={styles.root}>
       <HeaderBar time={time} battery={battery} />
-      <ShiftRing range="08:00 - 16:00" progress={0.62} />
-      <TaskCard machine="Máquina #04" badge={BADGES[taskStatus]} />
+      <Pressable accessibilityRole="button" accessibilityLabel="Configurar turno" onPress={onOpenConfig}>
+        <ShiftRing range={shiftRangeLabel(config.shift)} status={status} />
+      </Pressable>
+      <TaskCard machine={machine.name} icon={machine.icon} badge={BADGES[taskStatus]} onPress={onOpenConfig} />
     </View>
   );
 }
