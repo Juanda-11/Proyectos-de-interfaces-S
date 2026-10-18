@@ -1,24 +1,32 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { COLORS } from '../theme/tokens';
 import StatusBadge from './StatusBadge';
 
-// Tarjeta traslúcida (glass) con la máquina asignada y su badge de estado.
-export default function TaskCard({ machine = 'Máquina #04', badge }) {
+// Tarjeta traslúcida (glass) con el equipo asignado y su estado. Al tocarla se abre la configuración.
+export default function TaskCard({ machine = 'Máquina #04', icon, badge, onPress }) {
   return (
-    <View style={styles.card}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Equipo asignado: ${machine}. Toca para configurar`}
+      onPress={onPress}
+      style={({ pressed }) => [styles.card, pressed && { opacity: 0.7 }]}
+    >
       <View style={{ flex: 1 }}>
-        <Text style={styles.label}>MÁQUINA ASIGNADA</Text>
-        <Text style={styles.machine} numberOfLines={1}>{machine}</Text>
+        <Text style={styles.label}>EQUIPO ASIGNADO ⚙</Text>
+        <Text style={styles.machine} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+          {icon ? `${icon} ` : ''}
+          {machine}
+        </Text>
       </View>
       <StatusBadge label={badge.label} variant={badge.variant} pulse={badge.pulse} />
-    </View>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    width: 250,
+    width: 270,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.glass,
@@ -27,7 +35,8 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingVertical: 10,
     paddingHorizontal: 14,
+    gap: 8,
   },
   label: { color: COLORS.dim, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
-  machine: { color: COLORS.white, fontSize: 22, fontWeight: '900', marginTop: 1 },
+  machine: { color: COLORS.white, fontSize: 20, fontWeight: '900', marginTop: 1 },
 });
