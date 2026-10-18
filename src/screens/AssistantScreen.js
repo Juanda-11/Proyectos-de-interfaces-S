@@ -31,7 +31,7 @@ export default function AssistantScreen({ active, onDone }) {
   };
 
   const waveActive = a.speaking || a.phase === 'thinking' || voice.listening;
-  const sourceLabel = a.plan?.source === 'gemini' ? 'GEMINI' : a.plan ? 'SIN CONEXIÓN' : null;
+  const sourceLabel = a.plan?.source === 'gemini' ? 'GEMINI' : a.plan ? 'OFFLINE' : null;
 
   let body;
   if (voice.listening) {
@@ -165,7 +165,9 @@ export default function AssistantScreen({ active, onDone }) {
         end={{ x: 1, y: 1 }}
         style={styles.chip}
       >
-        <Text style={styles.chipText}>🤖 ASISTENTE IA{sourceLabel ? ` · ${sourceLabel}` : ''}</Text>
+        <Text style={styles.chipText}>
+          {sourceLabel ? `🤖 IA · ${sourceLabel}` : '🤖 ASISTENTE IA'}
+        </Text>
       </LinearGradient>
       <VoiceWave active={waveActive} />
       {body}
