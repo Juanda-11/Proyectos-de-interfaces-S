@@ -1,4 +1,12 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react';
 import { DEFAULT_CONFIG, SIMULATION_OPTIONS, configReducer } from './configReducer';
 import { loadConfig, saveConfig } from './storage';
 import { createSimulatedAlert, machineDisplayName } from '../utils/faults';
@@ -12,7 +20,6 @@ export function WorkerProvider({ children, initialConfig }) {
   const [hydrated, setHydrated] = useState(Boolean(initialConfig));
   const [taskStatus, setTaskStatus] = useState('active'); // 'active' | 'attending' | 'reported'
   const [alert, setAlert] = useState(null);
-  const alertListeners = useRef(new Set());
 
   useEffect(() => {
     if (initialConfig) return undefined;
@@ -31,21 +38,15 @@ export function WorkerProvider({ children, initialConfig }) {
     if (hydrated) saveConfig(config);
   }, [config, hydrated]);
 
-  // Crea una alerta simulada y avisa a quien escuche (para saltar a la pantalla de alerta).
+  // Crea una alerta simulada del sensor del equipo configurado.
   const triggerAlert = useCallback(
     (faultId) => {
       const next = createSimulatedAlert(config, { faultId });
       setAlert(next);
-      alertListeners.current.forEach((fn) => fn(next));
       return next;
     },
     [config]
   );
-
-  const onAlert = useCallback((fn) => {
-    alertListeners.current.add(fn);
-    return () => alertListeners.current.delete(fn);
-  }, []);
 
   const value = useMemo(() => {
     const type = getMachineType(config.machineTypeId);
@@ -64,10 +65,9 @@ export function WorkerProvider({ children, initialConfig }) {
       alert,
       setAlert,
       triggerAlert,
-      onAlert,
       simulationSeconds: SIMULATION_OPTIONS.find((o) => o.id === config.simulation)?.seconds ?? 0,
     };
-  }, [config, hydrated, taskStatus, alert, triggerAlert, onAlert]);
+  }, [config, hydrated, taskStatus, alert, triggerAlert]);
 
   return <WorkerContext.Provider value={value}>{children}</WorkerContext.Provider>;
 }
