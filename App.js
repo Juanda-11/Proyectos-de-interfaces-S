@@ -1,23 +1,48 @@
-import React, { useCallback, useRef, useState } from 'react';
-import { Animated, Easing, PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  BackHandler,
+  Easing,
+  PanResponder,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import WatchFrame from './src/components/WatchFrame';
 import PageDots from './src/components/PageDots';
 import HomeScreen from './src/screens/HomeScreen';
 import AlertScreen from './src/screens/AlertScreen';
 import AssistantScreen from './src/screens/AssistantScreen';
+import ConfigScreen from './src/screens/ConfigScreen';
+import { WorkerProvider, useWorker } from './src/context/WorkerContext';
+import useApiStatus from './src/hooks/useApiStatus';
 import { COLORS, WATCH_SIZE } from './src/theme/tokens';
+import { isWatchMode } from './src/utils/watchMode';
 
 const SCREENS = ['home', 'alert', 'assistant'];
 const GLOW = { home: '#60EFFF', alert: '#FF416C', assistant: '#A855F7' };
 const W = WATCH_SIZE;
+const WATCH_MODE = isWatchMode();
+
+export default function App() {
+  return (
+    <WorkerProvider>
+      <WatchApp />
+    </WorkerProvider>
+  );
+}
 
 // WatchContainer: emula el smartwatch y navega entre Dashboard → Alerta IA → Asistente IA.
-export default function App() {
+// La configuración del puesto (equipo y turno) se abre como una capa sobre el dashboard.
+function WatchApp() {
+  const { hydrated, setTaskStatus, setAlert, triggerAlert, simulationSeconds } = useWorker();
   const [screen, setScreen] = useState('home');
-  const [taskStatus, setTaskStatus] = useState('active'); // 'active' | 'attending' | 'reported'
+  const [configOpen, setConfigOpen] = useState(false);
   const progress = useRef(new Animated.Value(0)).current; // 0 home · 1 alerta · 2 asistente
   const screenRef = useRef('home');
+  const configRef = useRef(false);
 
   const goTo = useCallback(
     (target) => {
@@ -33,10 +58,54 @@ export default function App() {
     [progress]
   );
 
+  const openConfig = useCallback(() => {
+    configRef.current = true;
+    setConfigOpen(true);
+  }, []);
+  const closeConfig = useCallback(() => {
+    configRef.current = false;
+    setConfigOpen(false);
+  }, []);
+
+  // Alerta simulada del sensor del equipo configurado
+  const simulateAlert = useCallback(() => {
+    triggerAlert();
+    setTaskStatus('active');
+    closeConfig();
+    goTo('alert');
+  }, [triggerAlert, setTaskStatus, closeConfig, goTo]);
+
+  // Simulación automática: lanza una falla cada N segundos mientras el trabajador está en el dashboard
+  useEffect(() => {
+    if (!simulationSeconds || !hydrated) return undefined;
+    const id = setInterval(() => {
+      if (screenRef.current === 'home' && !configRef.current) simulateAlert();
+    }, simulationSeconds * 1000);
+    return () => clearInterval(id);
+  }, [simulationSeconds, hydrated, simulateAlert]);
+
+  // Botón/gesto "atrás" del reloj (Wear OS y Android): cierra la configuración o vuelve de pantalla
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (configRef.current) {
+        closeConfig();
+        return true;
+      }
+      const i = SCREENS.indexOf(screenRef.current);
+      if (i > 0) {
+        goTo(SCREENS[i - 1]);
+        return true;
+      }
+      return false;
+    });
+    return () => sub.remove();
+  }, [closeConfig, goTo]);
+
   // Gesto: deslizar ← avanza, → retrocede
   const pan = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 25 && Math.abs(g.dy) < 25,
+      onMoveShouldSetPanResponder: (_, g) =>
+        !configRef.current && Math.abs(g.dx) > 25 && Math.abs(g.dy) < 25,
       onPanResponderRelease: (_, g) => {
         const i = SCREENS.indexOf(screenRef.current);
         if (g.dx < -40) goTo(SCREENS[Math.min(i + 1, SCREENS.length - 1)]);
@@ -59,6 +128,14 @@ export default function App() {
   // LISTO en el último paso → la máquina vuelve a estar activa
   const handleAssistantDone = () => {
     setTaskStatus('active');
+    setAlert(null);
+    goTo('home');
+  };
+
+  const reset = () => {
+    setTaskStatus('active');
+    setAlert(null);
+    closeConfig();
     goTo('home');
   };
 
@@ -73,12 +150,15 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar style="light" />
 
-      <WatchFrame glow={GLOW[screen]} panHandlers={pan.panHandlers}>
+      <WatchFrame glow={GLOW[screen]} panHandlers={pan.panHandlers} fullscreen={WATCH_MODE}>
         <Animated.View
-          style={[StyleSheet.absoluteFill, { opacity: homeOpacity, transform: [{ translateX: homeX }] }]}
-          pointerEvents={screen === 'home' ? 'auto' : 'none'}
+          style={[
+            StyleSheet.absoluteFill,
+            { opacity: homeOpacity, transform: [{ translateX: homeX }] },
+          ]}
+          pointerEvents={screen === 'home' && !configOpen ? 'auto' : 'none'}
         >
-          <HomeScreen taskStatus={taskStatus} battery={82} />
+          <HomeScreen battery={82} onOpenConfig={openConfig} />
         </Animated.View>
 
         <Animated.View
@@ -96,32 +176,102 @@ export default function App() {
         </Animated.View>
 
         <PageDots index={SCREENS.indexOf(screen)} />
+
+        {configOpen ? (
+          <View style={StyleSheet.absoluteFill}>
+            <ConfigScreen onClose={closeConfig} onSimulate={simulateAlert} />
+          </View>
+        ) : null}
       </WatchFrame>
 
-      {/* Controles de demostración (fuera del reloj) */}
+      {WATCH_MODE ? null : (
+        <DemoPanel
+          onDashboard={() => {
+            closeConfig();
+            goTo('home');
+          }}
+          onAlert={simulateAlert}
+          onAssistant={() => {
+            closeConfig();
+            goTo('assistant');
+          }}
+          onConfig={() => {
+            goTo('home');
+            openConfig();
+          }}
+          onReset={reset}
+        />
+      )}
+    </View>
+  );
+}
+
+// Controles de demostración (fuera del reloj). No se muestran en el modo reloj.
+function DemoPanel({ onDashboard, onAlert, onAssistant, onConfig, onReset }) {
+  const { status, model } = useApiStatus();
+  const labels = {
+    unconfigured: ['#A7B0C0', 'IA sin backend · modo sin conexión'],
+    checking: ['#FFB020', 'Conectando con el backend…'],
+    online: ['#00FF87', `IA conectada${model ? ` · ${model}` : ''}`],
+    degraded: ['#FFB020', 'Backend activo, falta GEMINI_API_KEY'],
+    offline: ['#FF416C', 'Backend sin respuesta · modo sin conexión'],
+  };
+  const [color, text] = labels[status];
+
+  return (
+    <>
       <Text style={styles.hint}>Desliza ← → dentro del reloj o usa los botones</Text>
       <View style={styles.controls}>
-        <DemoButton label="DASHBOARD" onPress={() => goTo('home')} />
-        <DemoButton label="SIMULAR ALERTA" onPress={() => goTo('alert')} />
-        <DemoButton label="ASISTENTE" onPress={() => goTo('assistant')} />
-        <DemoButton label="REINICIAR" onPress={() => { setTaskStatus('active'); goTo('home'); }} />
+        <DemoButton label="DASHBOARD" onPress={onDashboard} />
+        <DemoButton label="SIMULAR ALERTA" onPress={onAlert} />
+        <DemoButton label="ASISTENTE" onPress={onAssistant} />
+        <DemoButton label="CONFIGURAR" onPress={onConfig} />
+        <DemoButton label="REINICIAR" onPress={onReset} />
       </View>
-    </View>
+      <View style={styles.status}>
+        <View style={[styles.statusDot, { backgroundColor: color }]} />
+        <Text style={styles.statusText}>{text}</Text>
+      </View>
+    </>
   );
 }
 
 function DemoButton({ label, onPress }) {
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.demoBtn, pressed && { opacity: 0.6 }]}>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.demoBtn, pressed && { opacity: 0.6 }]}
+    >
       <Text style={styles.demoText}>{label}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg, alignItems: 'center', justifyContent: 'center' },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.bg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   hint: { color: COLORS.dim, fontSize: 12, marginTop: 28 },
-  controls: { flexDirection: 'row', gap: 8, marginTop: 12, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 380 },
-  demoBtn: { borderWidth: 1, borderColor: '#2A3350', borderRadius: 999, paddingVertical: 9, paddingHorizontal: 14 },
+  controls: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 12,
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    maxWidth: 420,
+  },
+  demoBtn: {
+    borderWidth: 1,
+    borderColor: '#2A3350',
+    borderRadius: 999,
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+  },
   demoText: { color: COLORS.dim, fontSize: 12, fontWeight: '800', letterSpacing: 1 },
+  status: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 14 },
+  statusDot: { width: 8, height: 8, borderRadius: 4 },
+  statusText: { color: COLORS.dim, fontSize: 12, fontWeight: '600' },
 });
