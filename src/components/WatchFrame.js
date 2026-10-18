@@ -3,8 +3,24 @@ import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { COLORS, WATCH_SIZE } from '../theme/tokens';
 
 // Marco circular que emula el smartwatch (380 x 380). Se reduce solo en pantallas angostas.
-export default function WatchFrame({ children, glow = '#60EFFF', panHandlers }) {
-  const { width } = useWindowDimensions();
+// Con `fullscreen` (reloj físico) no dibuja el marco: escala la interfaz para llenar la pantalla.
+export default function WatchFrame({ children, glow = '#60EFFF', panHandlers, fullscreen = false }) {
+  const { width, height } = useWindowDimensions();
+
+  if (fullscreen) {
+    const scale = Math.min(width, height) / WATCH_SIZE;
+    return (
+      <View style={[styles.full, { width, height }]}>
+        <View
+          style={{ width: WATCH_SIZE, height: WATCH_SIZE, transform: [{ scale }], overflow: 'hidden' }}
+          {...panHandlers}
+        >
+          {children}
+        </View>
+      </View>
+    );
+  }
+
   const scale = Math.min(1, (width - 32) / (WATCH_SIZE + 12));
 
   return (
@@ -22,6 +38,7 @@ export default function WatchFrame({ children, glow = '#60EFFF', panHandlers }) 
 }
 
 const styles = StyleSheet.create({
+  full: { backgroundColor: COLORS.bg, alignItems: 'center', justifyContent: 'center' },
   ring: {
     width: WATCH_SIZE,
     height: WATCH_SIZE,
