@@ -22,13 +22,13 @@ export default function useAssistant({ active, alert, machine, voiceEnabled }) {
   const latest = useRef({});
   latest.current = { alert, machine, plan, step, history, speaker };
 
-  const begin = () => {
+  const begin = useCallback(() => {
     abortRef.current?.abort();
     abortRef.current = new AbortController();
     latest.current.speaker.stop();
     setPhase('thinking');
     return abortRef.current.signal;
-  };
+  }, []);
 
   const applyPlan = useCallback((result, intro) => {
     setPlan(result);
@@ -55,7 +55,7 @@ export default function useAssistant({ active, alert, machine, voiceEnabled }) {
         setReply('No pude analizar la falla. Avisa a tu supervisor.');
       }
     },
-    [applyPlan]
+    [applyPlan, begin]
   );
 
   // Pregunta o descripción de un problema (voz o teclado).
@@ -90,7 +90,7 @@ export default function useAssistant({ active, alert, machine, voiceEnabled }) {
         setReply('No pude responder. Intenta de nuevo.');
       }
     },
-    []
+    [begin]
   );
 
   const voice = useVoiceInput({ onFinal: (text) => ask(text) });
