@@ -77,13 +77,15 @@ export default function useAssistant({ active, alert, machine, voiceEnabled }) {
             -8
           )
         );
-        setReply(res.reply);
         if (res.steps?.length) {
+          // Plan nuevo: la respuesta solo se dice en voz alta; en pantalla se ve el paso 1
+          setReply(null);
           setPlan((old) => ({ ...old, ...res }));
           setStep(0);
           setPhase('steps');
           latest.current.speaker.speak(`${res.reply} ${res.steps[0].voice}`);
         } else {
+          setReply(res.reply);
           setPhase(p ? 'steps' : 'idle');
           latest.current.speaker.speak(res.reply);
         }
