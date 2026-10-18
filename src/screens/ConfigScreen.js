@@ -33,7 +33,6 @@ export default function ConfigScreen({ onClose, onSimulate }) {
               key={type.id}
               icon={type.icon}
               label={type.label}
-              detail={type.sector}
               selected={type.id === config.machineTypeId}
               onPress={() => dispatch({ type: 'setMachineType', id: type.id })}
             />
