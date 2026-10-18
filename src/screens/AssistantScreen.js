@@ -67,10 +67,21 @@ export default function AssistantScreen({ active, onDone }) {
           accessibilityLabel="Describe el problema"
         />
         <View style={styles.row}>
-          <Pressable onPress={() => setTyping(false)} style={styles.roundBtn} accessibilityLabel="Cancelar">
+          <Pressable
+            onPress={() => setTyping(false)}
+            style={styles.roundBtn}
+            accessibilityLabel="Cancelar"
+          >
             <Text style={styles.roundIcon}>✕</Text>
           </Pressable>
-          <GradientButton label="ENVIAR" variant="ai" width={170} height={56} fontSize={20} onPress={send} />
+          <GradientButton
+            label="ENVIAR"
+            variant="ai"
+            width={170}
+            height={56}
+            fontSize={20}
+            onPress={send}
+          />
         </View>
       </>
     );
@@ -148,7 +159,12 @@ export default function AssistantScreen({ active, onDone }) {
 
   return (
     <View style={styles.root}>
-      <LinearGradient colors={GRADIENTS.ai} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.chip}>
+      <LinearGradient
+        colors={GRADIENTS.ai}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.chip}
+      >
         <Text style={styles.chipText}>🤖 ASISTENTE IA{sourceLabel ? ` · ${sourceLabel}` : ''}</Text>
       </LinearGradient>
       <VoiceWave active={waveActive} />

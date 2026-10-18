@@ -47,7 +47,13 @@ export function getShiftStatus(shift, now = new Date()) {
   const start = parseTime(shift?.start);
   const durationMinutes = shiftDuration(shift);
   if (start === null || durationMinutes === 0) {
-    return { active: false, progress: 0, remainingMinutes: 0, minutesUntilStart: 0, durationMinutes: 0 };
+    return {
+      active: false,
+      progress: 0,
+      remainingMinutes: 0,
+      minutesUntilStart: 0,
+      durationMinutes: 0,
+    };
   }
 
   const current = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;

@@ -4,7 +4,12 @@ import { COLORS, WATCH_SIZE } from '../theme/tokens';
 
 // Marco circular que emula el smartwatch (380 x 380). Se reduce solo en pantallas angostas.
 // Con `fullscreen` (reloj físico) no dibuja el marco: escala la interfaz para llenar la pantalla.
-export default function WatchFrame({ children, glow = '#60EFFF', panHandlers, fullscreen = false }) {
+export default function WatchFrame({
+  children,
+  glow = '#60EFFF',
+  panHandlers,
+  fullscreen = false,
+}) {
   const { width, height } = useWindowDimensions();
 
   if (fullscreen) {
@@ -12,7 +17,12 @@ export default function WatchFrame({ children, glow = '#60EFFF', panHandlers, fu
     return (
       <View style={[styles.full, { width, height }]}>
         <View
-          style={{ width: WATCH_SIZE, height: WATCH_SIZE, transform: [{ scale }], overflow: 'hidden' }}
+          style={{
+            width: WATCH_SIZE,
+            height: WATCH_SIZE,
+            transform: [{ scale }],
+            overflow: 'hidden',
+          }}
           {...panHandlers}
         >
           {children}

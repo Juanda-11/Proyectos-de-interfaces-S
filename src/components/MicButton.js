@@ -34,7 +34,10 @@ export default function MicButton({ listening, onPress, size = 56, disabled }) {
         tap();
         onPress();
       }}
-      style={({ pressed }) => [{ width: size, height: size, opacity: disabled ? 0.4 : 1 }, pressed && { opacity: 0.7 }]}
+      style={({ pressed }) => [
+        { width: size, height: size, opacity: disabled ? 0.4 : 1 },
+        pressed && { opacity: 0.7 },
+      ]}
     >
       <Animated.View
         pointerEvents="none"

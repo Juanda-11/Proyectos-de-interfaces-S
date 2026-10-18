@@ -34,7 +34,8 @@ export default function useAssistant({ active, alert, machine, voiceEnabled }) {
     setPlan(result);
     setStep(0);
     setPhase('steps');
-    const lead = intro ?? (result.severity === 'critical' ? 'Atención, falla crítica.' : result.summary);
+    const lead =
+      intro ?? (result.severity === 'critical' ? 'Atención, falla crítica.' : result.summary);
     latest.current.speaker.speak(`${lead}. ${result.steps[0].voice}`);
   }, []);
 
@@ -72,7 +73,9 @@ export default function useAssistant({ active, alert, machine, voiceEnabled }) {
         );
         if (signal.aborted) return;
         setHistory((prev) =>
-          [...prev, { role: 'user', text: message }, { role: 'assistant', text: res.reply }].slice(-8)
+          [...prev, { role: 'user', text: message }, { role: 'assistant', text: res.reply }].slice(
+            -8
+          )
         );
         setReply(res.reply);
         if (res.steps?.length) {

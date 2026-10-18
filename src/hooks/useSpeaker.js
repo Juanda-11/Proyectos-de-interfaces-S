@@ -31,7 +31,13 @@ export default function useSpeaker({ enabled = true, lang = 'es-ES', rate = 1.0 
       timer.current = setTimeout(finish, text.length * 80 + 1500);
       if (!enabled) return;
       try {
-        Speech.speak(text, { language: lang, rate, onDone: finish, onStopped: finish, onError: finish });
+        Speech.speak(text, {
+          language: lang,
+          rate,
+          onDone: finish,
+          onStopped: finish,
+          onError: finish,
+        });
       } catch (e) {
         finish();
       }

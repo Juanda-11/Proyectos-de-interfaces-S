@@ -24,10 +24,19 @@ export default function HomeScreen({ battery = 82, onOpenConfig }) {
   return (
     <View style={styles.root}>
       <HeaderBar time={time} battery={battery} />
-      <Pressable accessibilityRole="button" accessibilityLabel="Configurar turno" onPress={onOpenConfig}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Configurar turno"
+        onPress={onOpenConfig}
+      >
         <ShiftRing range={shiftRangeLabel(config.shift)} status={status} />
       </Pressable>
-      <TaskCard machine={machine.name} icon={machine.icon} badge={BADGES[taskStatus]} onPress={onOpenConfig} />
+      <TaskCard
+        machine={machine.name}
+        icon={machine.icon}
+        badge={BADGES[taskStatus]}
+        onPress={onOpenConfig}
+      />
     </View>
   );
 }

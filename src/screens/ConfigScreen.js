@@ -78,14 +78,38 @@ export default function ConfigScreen({ onClose, onSimulate }) {
             <Stepper
               label="ENTRADA"
               value={config.shift.start}
-              onMinus={() => dispatch({ type: 'setShiftTime', field: 'start', value: shiftTime(config.shift.start, -30) })}
-              onPlus={() => dispatch({ type: 'setShiftTime', field: 'start', value: shiftTime(config.shift.start, 30) })}
+              onMinus={() =>
+                dispatch({
+                  type: 'setShiftTime',
+                  field: 'start',
+                  value: shiftTime(config.shift.start, -30),
+                })
+              }
+              onPlus={() =>
+                dispatch({
+                  type: 'setShiftTime',
+                  field: 'start',
+                  value: shiftTime(config.shift.start, 30),
+                })
+              }
             />
             <Stepper
               label="SALIDA"
               value={config.shift.end}
-              onMinus={() => dispatch({ type: 'setShiftTime', field: 'end', value: shiftTime(config.shift.end, -30) })}
-              onPlus={() => dispatch({ type: 'setShiftTime', field: 'end', value: shiftTime(config.shift.end, 30) })}
+              onMinus={() =>
+                dispatch({
+                  type: 'setShiftTime',
+                  field: 'end',
+                  value: shiftTime(config.shift.end, -30),
+                })
+              }
+              onPlus={() =>
+                dispatch({
+                  type: 'setShiftTime',
+                  field: 'end',
+                  value: shiftTime(config.shift.end, 30),
+                })
+              }
             />
           </View>
         ) : null}
@@ -116,8 +140,22 @@ export default function ConfigScreen({ onClose, onSimulate }) {
         </View>
 
         <View style={styles.actions}>
-          <GradientButton label="SIMULAR FALLA" variant="alert" width={260} height={54} fontSize={18} onPress={onSimulate} />
-          <GradientButton label="LISTO" variant="safe" width={260} height={54} fontSize={20} onPress={onClose} />
+          <GradientButton
+            label="SIMULAR FALLA"
+            variant="alert"
+            width={260}
+            height={54}
+            fontSize={18}
+            onPress={onSimulate}
+          />
+          <GradientButton
+            label="LISTO"
+            variant="safe"
+            width={260}
+            height={54}
+            fontSize={20}
+            onPress={onClose}
+          />
         </View>
       </ScrollView>
     </View>

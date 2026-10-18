@@ -13,21 +13,32 @@ export default function VoiceWave({ active }) {
 
   // Envolvente: las barras del centro son más altas
   const envelope = useMemo(
-    () => Array.from({ length: BARS }, (_, i) => 0.35 + 0.65 * Math.sin((Math.PI * (i + 0.5)) / BARS)),
+    () =>
+      Array.from({ length: BARS }, (_, i) => 0.35 + 0.65 * Math.sin((Math.PI * (i + 0.5)) / BARS)),
     []
   );
 
   useEffect(() => {
     if (!active) {
-      values.forEach((v) => Animated.timing(v, { toValue: 0.15, duration: 250, useNativeDriver: true }).start());
+      values.forEach((v) =>
+        Animated.timing(v, { toValue: 0.15, duration: 250, useNativeDriver: true }).start()
+      );
       return undefined;
     }
     const loops = values.map((v, i) => {
       const peak = envelope[i] * (0.6 + Math.random() * 0.4);
       const loop = Animated.loop(
         Animated.sequence([
-          Animated.timing(v, { toValue: peak, duration: 220 + Math.random() * 260, useNativeDriver: true }),
-          Animated.timing(v, { toValue: 0.18, duration: 220 + Math.random() * 260, useNativeDriver: true }),
+          Animated.timing(v, {
+            toValue: peak,
+            duration: 220 + Math.random() * 260,
+            useNativeDriver: true,
+          }),
+          Animated.timing(v, {
+            toValue: 0.18,
+            duration: 220 + Math.random() * 260,
+            useNativeDriver: true,
+          }),
         ])
       );
       loop.start();
@@ -40,7 +51,12 @@ export default function VoiceWave({ active }) {
     <View style={styles.row}>
       {values.map((v, i) => (
         <Animated.View key={i} style={[styles.bar, { transform: [{ scaleY: v }] }]}>
-          <LinearGradient colors={GRADIENTS.ai} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.fill} />
+          <LinearGradient
+            colors={GRADIENTS.ai}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={styles.fill}
+          />
         </Animated.View>
       ))}
     </View>

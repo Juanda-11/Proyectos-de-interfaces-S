@@ -17,10 +17,20 @@ export default function GradientButton({
 
   const pressIn = () => {
     tap();
-    Animated.spring(scale, { toValue: 0.94, speed: 40, bounciness: 0, useNativeDriver: true }).start();
+    Animated.spring(scale, {
+      toValue: 0.94,
+      speed: 40,
+      bounciness: 0,
+      useNativeDriver: true,
+    }).start();
   };
   const pressOut = () =>
-    Animated.spring(scale, { toValue: 1, speed: 20, bounciness: 12, useNativeDriver: true }).start();
+    Animated.spring(scale, {
+      toValue: 1,
+      speed: 20,
+      bounciness: 12,
+      useNativeDriver: true,
+    }).start();
 
   return (
     <Pressable onPressIn={pressIn} onPressOut={pressOut} onPress={onPress}>

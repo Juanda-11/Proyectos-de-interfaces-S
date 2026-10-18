@@ -7,5 +7,12 @@ export default function SectionTitle({ children, color = COLORS.cyan }) {
 }
 
 const styles = StyleSheet.create({
-  title: { fontSize: 12, fontWeight: '900', letterSpacing: 2, marginTop: 16, marginBottom: 2, width: 270 },
+  title: {
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 2,
+    marginTop: 16,
+    marginBottom: 2,
+    width: 270,
+  },
 });

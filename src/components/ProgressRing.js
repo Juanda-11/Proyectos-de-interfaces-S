@@ -38,7 +38,14 @@ export default function ProgressRing({
           </LinearGradient>
         </Defs>
         {/* Pista de fondo */}
-        <Circle cx={size / 2} cy={size / 2} r={r} stroke="rgba(255,255,255,0.1)" strokeWidth={stroke} fill="none" />
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke="rgba(255,255,255,0.1)"
+          strokeWidth={stroke}
+          fill="none"
+        />
         {/* Progreso */}
         <AnimatedCircle
           cx={size / 2}

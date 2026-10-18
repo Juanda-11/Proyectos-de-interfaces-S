@@ -31,7 +31,11 @@ export default function StatusBadge({ label, variant = 'safe', pulse = true }) {
       <Animated.View
         style={[
           styles.halo,
-          { backgroundColor: GLOW[variant], opacity: haloOpacity, transform: [{ scale: haloScale }] },
+          {
+            backgroundColor: GLOW[variant],
+            opacity: haloOpacity,
+            transform: [{ scale: haloScale }],
+          },
         ]}
       />
       <LinearGradient

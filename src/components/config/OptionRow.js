@@ -4,7 +4,14 @@ import { COLORS } from '../../theme/tokens';
 import { tap } from '../../utils/haptics';
 
 // Fila seleccionable (icono + texto) para listas de opciones del reloj.
-export default function OptionRow({ icon, label, detail, selected, onPress, accent = COLORS.cyan }) {
+export default function OptionRow({
+  icon,
+  label,
+  detail,
+  selected,
+  onPress,
+  accent = COLORS.cyan,
+}) {
   return (
     <Pressable
       accessibilityRole="radio"

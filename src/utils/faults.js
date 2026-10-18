@@ -13,7 +13,10 @@ function pick(list, rand) {
 }
 
 // Genera una alerta simulada de un sensor para el equipo configurado.
-export function createSimulatedAlert(config, { faultId, rand = Math.random, now = Date.now() } = {}) {
+export function createSimulatedAlert(
+  config,
+  { faultId, rand = Math.random, now = Date.now() } = {}
+) {
   const type = getMachineType(config.machineTypeId);
   const fault = (faultId && getFault(type.id, faultId)) || pick(type.faults, rand);
   const [min, max] = fault.range;
