@@ -21,12 +21,18 @@ describe('sanitizeConfig', () => {
 
 describe('configReducer', () => {
   it('cambia el tipo de máquina', () => {
-    expect(configReducer(DEFAULT_CONFIG, { type: 'setMachineType', id: 'press' }).machineTypeId).toBe('press');
+    expect(
+      configReducer(DEFAULT_CONFIG, { type: 'setMachineType', id: 'press' }).machineTypeId
+    ).toBe('press');
   });
 
   it('limita el número de máquina entre 1 y 99', () => {
-    expect(configReducer(DEFAULT_CONFIG, { type: 'setMachineNumber', value: 0 }).machineNumber).toBe(1);
-    expect(configReducer(DEFAULT_CONFIG, { type: 'setMachineNumber', value: 120 }).machineNumber).toBe(99);
+    expect(
+      configReducer(DEFAULT_CONFIG, { type: 'setMachineNumber', value: 0 }).machineNumber
+    ).toBe(1);
+    expect(
+      configReducer(DEFAULT_CONFIG, { type: 'setMachineNumber', value: 120 }).machineNumber
+    ).toBe(99);
   });
 
   it('aplicar un preset de turno actualiza las horas', () => {

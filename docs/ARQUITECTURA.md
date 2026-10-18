@@ -45,6 +45,7 @@ stateDiagram-v2
 **La IA nunca deja al trabajador sin respuesta.** `api/client.js` intenta el backend (15 s de timeout); ante cualquier error devuelve el plan local del catálogo o, si el texto no coincide con ninguna falla, un procedimiento general de seguridad. El chip del asistente indica el origen (`IA · GEMINI` / `IA · OFFLINE`).
 
 **Voz de entrada y salida.**
+
 - Salida: `expo-speech` (TTS del sistema) con cancelación y temporizador de respaldo (`useSpeaker`).
 - Entrada: `expo-speech-recognition` (Web Speech API en navegador, reconocedor nativo en Android). Se carga con `require` protegido: si el módulo nativo no existe (Expo Go) o el navegador no lo soporta, la interfaz ofrece teclado y atajos de fallas.
 

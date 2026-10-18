@@ -1,5 +1,10 @@
 import { MACHINE_TYPES } from '../src/data/machineTypes';
-import { createSimulatedAlert, localPlan, machineDisplayName, matchFaultByText } from '../src/utils/faults';
+import {
+  createSimulatedAlert,
+  localPlan,
+  machineDisplayName,
+  matchFaultByText,
+} from '../src/utils/faults';
 
 const config = { machineTypeId: 'boiler', machineNumber: 4, customName: '' };
 

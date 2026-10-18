@@ -1,6 +1,11 @@
 describe('cliente de API', () => {
   const machine = { typeId: 'boiler', typeLabel: 'Caldera', name: 'Caldera #04' };
-  const alert = { faultId: 'boiler-overheat', title: 'TEMPERATURA ALTA', metric: 'Temperatura', reading: '94°C' };
+  const alert = {
+    faultId: 'boiler-overheat',
+    title: 'TEMPERATURA ALTA',
+    metric: 'Temperatura',
+    reading: '94°C',
+  };
 
   const load = (url) => {
     jest.resetModules();

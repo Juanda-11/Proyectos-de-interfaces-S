@@ -4,12 +4,12 @@
 
 ## Resumen
 
-| Opción | ¿Sirve para este proyecto? | Esfuerzo |
-| --- | --- | --- |
-| **Wear OS (Android) con el mismo código** | ✅ **Recomendada.** Wear OS es Android: la app Expo se compila a APK y se instala en el reloj. | Bajo |
-| Navegador del reloj (PWA) | ⚠️ Los relojes Wear OS modernos casi no traen navegador. No fiable. | Bajo, poco útil |
-| Apple Watch | ❌ Expo/React Native no genera apps de watchOS. Habría que reescribir la interfaz en SwiftUI (el backend se reutiliza tal cual). | Alto |
-| App nativa Kotlin (Compose for Wear OS) | ✅ Mejor producto final, pero es reescribir la interfaz. | Alto |
+| Opción                                    | ¿Sirve para este proyecto?                                                                                                       | Esfuerzo        |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| **Wear OS (Android) con el mismo código** | ✅ **Recomendada.** Wear OS es Android: la app Expo se compila a APK y se instala en el reloj.                                   | Bajo            |
+| Navegador del reloj (PWA)                 | ⚠️ Los relojes Wear OS modernos casi no traen navegador. No fiable.                                                              | Bajo, poco útil |
+| Apple Watch                               | ❌ Expo/React Native no genera apps de watchOS. Habría que reescribir la interfaz en SwiftUI (el backend se reutiliza tal cual). | Alto            |
+| App nativa Kotlin (Compose for Wear OS)   | ✅ Mejor producto final, pero es reescribir la interfaz.                                                                         | Alto            |
 
 ## Camino recomendado: Wear OS
 
@@ -17,7 +17,7 @@ Relojes compatibles: Pixel Watch, Galaxy Watch 4 o superior, y otros con **Wear 
 
 ### 1. Probar primero sin reloj (emulador)
 
-1. Instala [Android Studio](https://developer.android.com/studio) → *Device Manager* → *Create device* → categoría **Wear OS** → "Wear OS Large Round".
+1. Instala [Android Studio](https://developer.android.com/studio) → _Device Manager_ → _Create device_ → categoría **Wear OS** → "Wear OS Large Round".
 2. Compila el APK (paso 2) e instálalo con `adb install workerwatch.apk`.
 
 Es la forma más cómoda de demostrarlo en clase y de comprobar el diseño circular.
@@ -51,8 +51,8 @@ El perfil `watch` de [`eas.json`](../eas.json) compila con `EXPO_PUBLIC_WATCH_MO
 
 En el reloj:
 
-1. *Ajustes → Acerca del reloj → Información del software* → toca **Número de compilación** 7 veces.
-2. *Ajustes → Opciones de desarrollador* → activa **Depuración ADB** y **Depuración por Wi-Fi**.
+1. _Ajustes → Acerca del reloj → Información del software_ → toca **Número de compilación** 7 veces.
+2. _Ajustes → Opciones de desarrollador_ → activa **Depuración ADB** y **Depuración por Wi-Fi**.
 3. Conecta el reloj a la misma red Wi-Fi que tu computadora.
 
 En la computadora:
@@ -67,19 +67,19 @@ La app aparece en el lanzador del reloj como **WorkerWatch**.
 
 ## Qué verificar en el dispositivo real
 
-| Función | Cómo funciona en el reloj | Si falla |
-| --- | --- | --- |
-| **Vibración** | `Vibration` de React Native; patrón según la severidad de la alerta. | Revisa que el reloj no esté en modo silencio/teatro. |
-| **Voz del asistente** | `expo-speech` usa el motor de texto a voz de Android. Necesita altavoz del reloj o audífonos Bluetooth. | Instala "Google Text-to-Speech" y la voz en español. |
-| **Dictado** | `expo-speech-recognition` usa el reconocedor de Android (requiere servicios de Google). | Si no está disponible la app lo detecta y ofrece el teclado, y el teclado del reloj trae dictado. Siempre quedan los atajos de fallas de un toque. |
-| **Pantalla circular** | La interfaz está diseñada sobre 380 × 380 px y se escala a la pantalla del reloj. | Ajusta `WATCH_SIZE` en `src/theme/tokens.js` si un modelo recorta los bordes. |
-| **Batería** | Lee el nivel real con `expo-battery`. | Si no hay permiso, muestra un valor de demostración. |
-| **Sin red** | Cae al plan local del catálogo; el chip muestra `IA · OFFLINE`. | — |
+| Función               | Cómo funciona en el reloj                                                                               | Si falla                                                                                                                                           |
+| --------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Vibración**         | `Vibration` de React Native; patrón según la severidad de la alerta.                                    | Revisa que el reloj no esté en modo silencio/teatro.                                                                                               |
+| **Voz del asistente** | `expo-speech` usa el motor de texto a voz de Android. Necesita altavoz del reloj o audífonos Bluetooth. | Instala "Google Text-to-Speech" y la voz en español.                                                                                               |
+| **Dictado**           | `expo-speech-recognition` usa el reconocedor de Android (requiere servicios de Google).                 | Si no está disponible la app lo detecta y ofrece el teclado, y el teclado del reloj trae dictado. Siempre quedan los atajos de fallas de un toque. |
+| **Pantalla circular** | La interfaz está diseñada sobre 380 × 380 px y se escala a la pantalla del reloj.                       | Ajusta `WATCH_SIZE` en `src/theme/tokens.js` si un modelo recorta los bordes.                                                                      |
+| **Batería**           | Lee el nivel real con `expo-battery`.                                                                   | Si no hay permiso, muestra un valor de demostración.                                                                                               |
+| **Sin red**           | Cae al plan local del catálogo; el chip muestra `IA · OFFLINE`.                                         | —                                                                                                                                                  |
 
 ## Distribución a varios trabajadores
 
 - **Pruebas internas:** comparte el APK de EAS (distribución `internal`) y repite el paso 3.
-- **Google Play:** las apps de Wear OS deben declarar `android.hardware.type.watch` y `com.google.android.wearable.standalone` en el manifiesto, y subir capturas de reloj. Se agrega con un *config plugin* de Expo; no está incluido porque requiere una cuenta de Play Console para validarlo.
+- **Google Play:** las apps de Wear OS deben declarar `android.hardware.type.watch` y `com.google.android.wearable.standalone` en el manifiesto, y subir capturas de reloj. Se agrega con un _config plugin_ de Expo; no está incluido porque requiere una cuenta de Play Console para validarlo.
 - **Flota empresarial:** un MDM Android (p. ej. Google Endpoint Management) puede instalar el APK en todos los relojes.
 
 ## Y si la entrega exige Apple Watch
