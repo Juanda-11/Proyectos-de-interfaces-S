@@ -1,116 +1,203 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Speech from 'expo-speech';
-import VoiceWave from '../components/VoiceWave';
 import GradientButton from '../components/GradientButton';
+import MicButton from '../components/MicButton';
+import QuickFaults from '../components/QuickFaults';
+import VoiceWave from '../components/VoiceWave';
+import { useWorker } from '../context/WorkerContext';
+import { getMachineType } from '../data/machineTypes';
+import useAssistant from '../hooks/useAssistant';
 import { COLORS, GRADIENTS } from '../theme/tokens';
-import { STEPS } from '../data/repairSteps';
 import { tap } from '../utils/haptics';
 
-// Panel del asistente IA: onda de voz + pasos de reparación leídos en voz alta.
+// Panel del asistente IA (Gemini): guía la reparación paso a paso por voz y entiende preguntas
+// habladas o escritas. Si no hay conexión usa los planes locales del catálogo.
 export default function AssistantScreen({ active, onDone }) {
-  const [step, setStep] = useState(0);
-  const [replay, setReplay] = useState(0);
-  const [speaking, setSpeaking] = useState(false);
-  const token = useRef(0);
-  const last = step === STEPS.length - 1;
+  const { alert, machine, config } = useWorker();
+  const a = useAssistant({ active, alert, machine, voiceEnabled: config.voice });
+  const [typing, setTyping] = useState(false);
+  const [draft, setDraft] = useState('');
+  const faults = getMachineType(config.machineTypeId).faults;
+  const { voice } = a;
 
-  useEffect(() => {
-    const id = ++token.current; // ignora callbacks de lecturas anteriores
-    const stopped = () => {
-      if (token.current === id) setSpeaking(false);
-    };
+  const finish = () => (a.last ? onDone() : a.next());
+  const send = () => {
+    const text = draft.trim();
+    if (!text) return;
+    setDraft('');
+    setTyping(false);
+    a.ask(text);
+  };
 
-    if (!active) {
-      try { Speech.stop(); } catch (e) {}
-      setSpeaking(false);
-      const t = setTimeout(() => setStep(0), 450); // reinicia al salir
-      return () => clearTimeout(t);
-    }
+  const waveActive = a.speaking || a.phase === 'thinking' || voice.listening;
+  const sourceLabel = a.plan?.source === 'gemini' ? 'GEMINI' : a.plan ? 'SIN CONEXIÓN' : null;
 
-    const text = STEPS[step].voice;
-    setSpeaking(true);
-    try {
-      Speech.stop();
-      Speech.speak(text, { language: 'es-ES', rate: 1.0, onDone: stopped, onStopped: stopped, onError: stopped });
-    } catch (e) {}
-    const fallback = setTimeout(stopped, text.length * 70 + 800); // por si no hay voz disponible
-    return () => {
-      clearTimeout(fallback);
-      try { Speech.stop(); } catch (e) {}
-    };
-  }, [active, step, replay]);
-
-  const next = () => (last ? onDone() : setStep((s) => s + 1));
+  let body;
+  if (voice.listening) {
+    body = (
+      <>
+        <Text style={styles.caption}>TE ESCUCHO…</Text>
+        <Text style={styles.title} numberOfLines={3}>
+          {voice.transcript || 'Describe el problema'}
+        </Text>
+        <MicButton listening onPress={voice.stop} size={60} />
+      </>
+    );
+  } else if (a.phase === 'thinking') {
+    body = (
+      <>
+        <Text style={styles.caption}>ANALIZANDO…</Text>
+        <Text style={styles.title}>Consultando a la IA</Text>
+      </>
+    );
+  } else if (typing) {
+    body = (
+      <>
+        <Text style={styles.caption}>ESCRIBE O DICTA</Text>
+        <TextInput
+          autoFocus
+          value={draft}
+          onChangeText={setDraft}
+          onSubmitEditing={send}
+          returnKeyType="send"
+          placeholder="Ej: la prensa suena raro"
+          placeholderTextColor={COLORS.dim}
+          style={styles.input}
+          accessibilityLabel="Describe el problema"
+        />
+        <View style={styles.row}>
+          <Pressable onPress={() => setTyping(false)} style={styles.roundBtn} accessibilityLabel="Cancelar">
+            <Text style={styles.roundIcon}>✕</Text>
+          </Pressable>
+          <GradientButton label="ENVIAR" variant="ai" width={170} height={56} fontSize={20} onPress={send} />
+        </View>
+      </>
+    );
+  } else if (a.phase === 'steps' && a.plan) {
+    const current = a.plan.steps[a.step];
+    body = (
+      <>
+        <Text style={[styles.caption, a.plan.escalate && !a.speaking && { color: COLORS.warn }]}>
+          {a.speaking
+            ? 'HABLANDO…'
+            : a.plan.escalate
+              ? `PASO ${a.step + 1} DE ${a.total} · AVISA AL SUPERVISOR`
+              : `PASO ${a.step + 1} DE ${a.total}`}
+        </Text>
+        <Text style={[styles.title, a.reply && styles.reply]} numberOfLines={a.reply ? 4 : 2}>
+          {a.reply ?? current.title}
+        </Text>
+        <View style={styles.steps}>
+          {a.plan.steps.map((s, i) => (
+            <View key={s.id ?? i} style={[styles.stepBar, i <= a.step && styles.stepBarOn]} />
+          ))}
+        </View>
+        <View style={styles.row}>
+          <Pressable
+            accessibilityLabel="Repetir"
+            onPress={() => {
+              tap();
+              a.replay();
+            }}
+            style={({ pressed }) => [styles.roundBtn, pressed && { opacity: 0.6 }]}
+          >
+            <Text style={styles.roundIcon}>↻</Text>
+          </Pressable>
+          <GradientButton
+            label={a.last ? 'LISTO' : 'SIGUIENTE'}
+            variant={a.last ? 'safe' : 'ai'}
+            width={150}
+            height={56}
+            fontSize={20}
+            onPress={finish}
+          />
+          <MicButton listening={false} onPress={voice.start} size={56} />
+        </View>
+      </>
+    );
+  } else {
+    body = (
+      <>
+        <Text style={styles.caption}>¿QUÉ SUCEDE?</Text>
+        <Text style={[styles.title, styles.reply]} numberOfLines={3}>
+          {a.reply ?? voice.error ?? 'Habla, escribe o elige la falla'}
+        </Text>
+        <QuickFaults
+          faults={faults}
+          onPick={(f) =>
+            a.diagnose({
+              faultAlert: { faultId: f.id, title: f.title, metric: f.metric },
+              description: f.title,
+            })
+          }
+        />
+        <View style={styles.row}>
+          <MicButton listening={false} onPress={voice.start} size={60} />
+          <Pressable
+            accessibilityLabel="Escribir"
+            onPress={() => setTyping(true)}
+            style={({ pressed }) => [styles.roundBtn, pressed && { opacity: 0.6 }]}
+          >
+            <Text style={styles.roundIcon}>⌨</Text>
+          </Pressable>
+        </View>
+      </>
+    );
+  }
 
   return (
     <View style={styles.root}>
       <LinearGradient colors={GRADIENTS.ai} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.chip}>
-        <Text style={styles.chipText}>🤖 ASISTENTE IA</Text>
+        <Text style={styles.chipText}>🤖 ASISTENTE IA{sourceLabel ? ` · ${sourceLabel}` : ''}</Text>
       </LinearGradient>
-
-      <VoiceWave active={speaking} />
-
-      <Text style={styles.caption}>
-        {speaking ? 'HABLANDO…' : `PASO ${step + 1} DE ${STEPS.length}`}
-      </Text>
-      <Text style={styles.title} numberOfLines={2}>{STEPS[step].title}</Text>
-
-      {/* Progreso por pasos */}
-      <View style={styles.steps}>
-        {STEPS.map((s, i) => (
-          <View key={s.id} style={[styles.stepBar, i <= step && styles.stepBarOn]} />
-        ))}
-      </View>
-
-      <View style={styles.row}>
-        <Pressable
-          onPress={() => { tap(); setReplay((r) => r + 1); }}
-          style={({ pressed }) => [styles.replay, pressed && { opacity: 0.6, transform: [{ scale: 0.94 }] }]}
-        >
-          <Text style={styles.replayIcon}>↻</Text>
-        </Pressable>
-        <GradientButton
-          label={last ? 'LISTO' : 'SIGUIENTE'}
-          variant={last ? 'safe' : 'ai'}
-          width={180}
-          height={60}
-          fontSize={22}
-          onPress={next}
-        />
-      </View>
+      <VoiceWave active={waveActive} />
+      {body}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingBottom: 18 },
-  chip: { paddingVertical: 5, paddingHorizontal: 14, borderRadius: 999, marginBottom: 10 },
-  chipText: { color: COLORS.black, fontSize: 13, fontWeight: '900', letterSpacing: 1.5 },
-  caption: { color: '#A855F7', fontSize: 12, fontWeight: '900', letterSpacing: 2, marginTop: 8 },
+  root: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingBottom: 18, gap: 4 },
+  chip: { paddingVertical: 5, paddingHorizontal: 14, borderRadius: 999, marginBottom: 6 },
+  chipText: { color: COLORS.black, fontSize: 12, fontWeight: '900', letterSpacing: 1.2 },
+  caption: { color: COLORS.ai, fontSize: 12, fontWeight: '900', letterSpacing: 1.6, marginTop: 6 },
   title: {
     color: COLORS.white,
     fontSize: 24,
     fontWeight: '900',
     textAlign: 'center',
     width: 270,
-    height: 60,
+    minHeight: 58,
     marginTop: 2,
   },
-  steps: { flexDirection: 'row', gap: 6, marginVertical: 8 },
-  stepBar: { width: 28, height: 5, borderRadius: 3, backgroundColor: '#2A3350' },
-  stepBarOn: { backgroundColor: '#A855F7' },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  replay: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+  reply: { fontSize: 16, fontWeight: '700', lineHeight: 21 },
+  steps: { flexDirection: 'row', gap: 6, marginVertical: 6 },
+  stepBar: { width: 28, height: 5, borderRadius: 3, backgroundColor: COLORS.line },
+  stepBarOn: { backgroundColor: COLORS.ai },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 6 },
+  roundBtn: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: COLORS.glass,
     borderWidth: 1,
     borderColor: COLORS.glassBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  replayIcon: { color: COLORS.white, fontSize: 30, fontWeight: '900', marginTop: -3 },
+  roundIcon: { color: COLORS.white, fontSize: 26, fontWeight: '900', marginTop: -2 },
+  input: {
+    width: 250,
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '700',
+    backgroundColor: COLORS.glass,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
+    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    marginVertical: 8,
+  },
 });
