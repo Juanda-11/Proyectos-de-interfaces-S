@@ -10,6 +10,8 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useKeepAwake } from 'expo-keep-awake';
+import ErrorBoundary from './src/components/ErrorBoundary';
 import WatchFrame from './src/components/WatchFrame';
 import PageDots from './src/components/PageDots';
 import HomeScreen from './src/screens/HomeScreen';
@@ -28,10 +30,19 @@ const WATCH_MODE = isWatchMode();
 
 export default function App() {
   return (
-    <WorkerProvider>
-      <WatchApp />
-    </WorkerProvider>
+    <ErrorBoundary>
+      <WorkerProvider>
+        {WATCH_MODE ? <KeepScreenOn /> : null}
+        <WatchApp />
+      </WorkerProvider>
+    </ErrorBoundary>
   );
+}
+
+// En el reloj físico la pantalla no se apaga mientras la app está abierta (turno de trabajo).
+function KeepScreenOn() {
+  useKeepAwake();
+  return null;
 }
 
 // WatchContainer: emula el smartwatch y navega entre Dashboard → Alerta IA → Asistente IA.
