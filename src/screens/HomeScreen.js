@@ -4,6 +4,7 @@ import HeaderBar from '../components/HeaderBar';
 import ShiftRing from '../components/ShiftRing';
 import TaskCard from '../components/TaskCard';
 import { useWorker } from '../context/WorkerContext';
+import useBattery from '../hooks/useBattery';
 import useClock from '../hooks/useClock';
 import useShift from '../hooks/useShift';
 import { shiftRangeLabel } from '../utils/shift';
@@ -16,8 +17,9 @@ const BADGES = {
 };
 
 // Dashboard: hora, batería, turno real y equipo asignado (ambos configurables).
-export default function HomeScreen({ battery = 82, onOpenConfig }) {
+export default function HomeScreen({ onOpenConfig }) {
   const time = useClock();
+  const battery = useBattery();
   const { config, machine, taskStatus } = useWorker();
   const status = useShift(config.shift);
 

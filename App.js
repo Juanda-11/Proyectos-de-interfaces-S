@@ -158,7 +158,7 @@ function WatchApp() {
           ]}
           pointerEvents={screen === 'home' && !configOpen ? 'auto' : 'none'}
         >
-          <HomeScreen battery={82} onOpenConfig={openConfig} />
+          <HomeScreen onOpenConfig={openConfig} />
         </Animated.View>
 
         <Animated.View
