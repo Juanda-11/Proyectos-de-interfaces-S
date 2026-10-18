@@ -33,7 +33,13 @@ export default function GradientButton({
     }).start();
 
   return (
-    <Pressable onPressIn={pressIn} onPressOut={pressOut} onPress={onPress}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPressIn={pressIn}
+      onPressOut={pressOut}
+      onPress={onPress}
+    >
       <Animated.View
         style={[
           styles.shadow,
