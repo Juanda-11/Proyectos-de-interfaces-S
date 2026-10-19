@@ -23,9 +23,9 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_WATCH_MODE": "true",
-        "EXPO_PUBLIC_API_URL": "https://REEMPLAZA-CON-TU-BACKEND.vercel.app"
-      }
+        "EXPO_PUBLIC_WATCH_MODE": "true"
+      },
+      "environment": "production"
     },
     "production": {
       "autoIncrement": true
