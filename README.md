@@ -17,7 +17,7 @@ Aplicación **solo para smartwatch** pensada para trabajadores de planta: muestr
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **1 · Dashboard**    | Hora, batería real, anillo del turno (tiempo restante en tiempo real) y equipo asignado. **Toca el anillo o el equipo para configurarlos.**                                                          |
 | **2 · Alerta IA**    | Borde pulsante, vibración según severidad (media / alta / crítica) y botones gigantes **ACEPTAR** / **REPORTAR**.                                                                                    |
-| **3 · Asistente IA** | Plan de reparación paso a paso **hablado**. Puedes **preguntar o describir otro problema por voz o texto** ("la prensa hace un ruido metálico") y responde por voz.                                  |
+| **3 · Asistente IA** | Plan de reparación paso a paso **hablado**. Admite **preguntas o la descripción de otro problema por voz o texto** ("la prensa hace un ruido metálico") y responde por voz.                          |
 | **Configuración**    | Tipo de equipo (10 tipos, varios sectores), número y nombre, turno (estándar, mañana, tarde, noche o personalizado, incluso nocturno), simulación automática de fallas y voz on/off. Se guarda sola. |
 
 ### Simulación (no hay máquina conectada)
@@ -38,9 +38,9 @@ cp .env.example .env     # EXPO_PUBLIC_API_URL=http://localhost:3001 si corres e
 npm run web              # abre el simulador en el navegador
 ```
 
-Sin backend la app funciona completa en modo sin conexión. Para activar Gemini levanta el [backend](https://github.com/Juanda-11/Proyectos-de-interfaces-SB) y apunta `EXPO_PUBLIC_API_URL` a él. El panel bajo el reloj indica el estado ("IA conectada · gemini-…").
+Sin backend la app funciona completa en modo sin conexión. Para activar Gemini se usa el [backend](https://github.com/Juanda-11/Proyectos-de-interfaces-SB) y se apunta `EXPO_PUBLIC_API_URL` a él. El panel bajo el reloj indica el estado ("IA conectada · gemini-…").
 
-> En Android/iOS usa un _development build_ (no Expo Go) si quieres dictado por voz: `npx expo run:android`.
+> En Android/iOS el dictado por voz requiere un _development build_ (no Expo Go): `npx expo run:android`.
 
 | Comando                   | Descripción                     |
 | ------------------------- | ------------------------------- |
@@ -75,6 +75,6 @@ Estilo _Cyber-Industrial Premium_: fondo negro OLED, degradados neón (verde = s
 
 ## Limitaciones
 
-- Probada en navegador y con pruebas automáticas; **no se ha probado en un reloj físico** (ver la guía).
+- Validada en navegador y con pruebas automáticas; la prueba en un reloj físico está pendiente (ver [`docs/RELOJ_FISICO.md`](docs/RELOJ_FISICO.md)).
 - La lectura de sensores es simulada. Conectar una máquina real solo exige reemplazar `createSimulatedAlert` en `src/utils/faults.js`.
 - La IA es una ayuda y no sustituye los procedimientos oficiales de seguridad y mantenimiento.
