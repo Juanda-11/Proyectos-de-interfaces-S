@@ -50,6 +50,13 @@ describe('cliente de API', () => {
     expect(plan.fallbackReason).toBe('ai_unavailable');
   });
 
+  it('un error HTTP sin código del backend se reporta como http_<estado>', async () => {
+    const { requestDiagnosis } = load('https://api.test');
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 404, json: async () => ({}) });
+    const plan = await requestDiagnosis({ machine, alert });
+    expect(plan.fallbackReason).toBe('http_404');
+  });
+
   it('si no hay red, el chat responde sin conexión con aviso de seguridad', async () => {
     const { requestChat } = load('https://api.test');
     global.fetch = jest.fn().mockRejectedValue(new TypeError('network'));
