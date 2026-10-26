@@ -26,7 +26,7 @@ Es la forma más cómoda de demostrarlo en clase y de comprobar el diseño circu
 
 El perfil `watch` de [`eas.json`](../eas.json) compila con `EXPO_PUBLIC_WATCH_MODE=true`: la app ocupa toda la pantalla (sin el marco ni los botones de demostración), mantiene la pantalla encendida y escucha el botón/gesto "atrás" del reloj.
 
-1. Definir `EXPO_PUBLIC_API_URL` (URL del backend en Vercel) como variable de entorno de EAS: `eas env:create --environment production --name EXPO_PUBLIC_API_URL --value https://<backend>.vercel.app --visibility plaintext`.
+1. La URL del backend (`EXPO_PUBLIC_API_URL`) ya está definida en los perfiles `watch` y `preview` de [`eas.json`](../eas.json). Si el backend cambia de dirección, se actualiza ahí antes de compilar: la URL se incrusta en el APK al construirlo.
 2. Compilar en la nube de Expo (cuenta gratuita):
 
    ```bash
@@ -39,7 +39,7 @@ El perfil `watch` de [`eas.json`](../eas.json) compila con `EXPO_PUBLIC_WATCH_MO
    Alternativa local (requiere JDK 17 y Android SDK):
 
    ```bash
-   EXPO_PUBLIC_WATCH_MODE=true EXPO_PUBLIC_API_URL=https://tu-backend.vercel.app \
+   EXPO_PUBLIC_WATCH_MODE=true EXPO_PUBLIC_API_URL=https://backend-smartwatch.vercel.app \
      npx expo prebuild --platform android
    cd android && ./gradlew assembleRelease
    # APK en android/app/build/outputs/apk/release/
