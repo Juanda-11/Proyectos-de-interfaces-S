@@ -3,7 +3,7 @@ import { localPlan } from '../utils/faults';
 // URL del backend (repositorio Proyectos-de-interfaces-SB). Se define en .env / Vercel:
 //   EXPO_PUBLIC_API_URL=https://workerwatch-api.vercel.app
 const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? '').replace(/\/+$/, '');
-const TIMEOUT_MS = 15000;
+const TIMEOUT_MS = 25000;
 
 export const isApiConfigured = () => API_URL.length > 0;
 
@@ -34,7 +34,7 @@ async function request(path, { method = 'GET', body, signal } = {}) {
     if (!res.ok) {
       throw new ApiError(data?.error?.message ?? `Error ${res.status}`, {
         status: res.status,
-        code: data?.error?.code,
+        code: data?.error?.code ?? `http_${res.status}`,
       });
     }
     return data;
@@ -75,6 +75,7 @@ export async function requestDiagnosis({ machine, alert, description }, options)
     return data;
   } catch (e) {
     if (options?.signal?.aborted) throw e; // la pantalla ya no espera la respuesta
+    console.warn('WorkerWatch: IA no disponible (diagnose):', e.code, e.message);
     return {
       ...localPlan({ machineTypeId: machine.typeId, faultId: alert?.faultId, description }),
       fallbackReason: e.code ?? 'error',
@@ -106,6 +107,7 @@ export async function requestChat(
     });
   } catch (e) {
     if (options?.signal?.aborted) throw e;
+    console.warn('WorkerWatch: IA no disponible (chat):', e.code, e.message);
     const plan = localPlan({
       machineTypeId: machine.typeId,
       faultId: alert?.faultId,
