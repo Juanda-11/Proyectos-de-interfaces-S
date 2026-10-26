@@ -15,6 +15,9 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://backend-smartwatch.vercel.app"
       }
     },
     "watch": {
@@ -23,9 +26,9 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_WATCH_MODE": "true"
-      },
-      "environment": "production"
+        "EXPO_PUBLIC_WATCH_MODE": "true",
+        "EXPO_PUBLIC_API_URL": "https://backend-smartwatch.vercel.app"
+      }
     },
     "production": {
       "autoIncrement": true
