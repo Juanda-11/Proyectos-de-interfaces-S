@@ -9,6 +9,7 @@ import { useWorker } from '../context/WorkerContext';
 import { getMachineType } from '../data/machineTypes';
 import useAssistant from '../hooks/useAssistant';
 import { COLORS, GRADIENTS } from '../theme/tokens';
+import { aiSourceLabel } from '../utils/aiSource';
 import { tap } from '../utils/haptics';
 
 // Panel del asistente IA (Gemini): guía la reparación paso a paso por voz y entiende preguntas
@@ -31,7 +32,7 @@ export default function AssistantScreen({ active, onDone }) {
   };
 
   const waveActive = a.speaking || a.phase === 'thinking' || voice.listening;
-  const sourceLabel = a.plan?.source === 'gemini' ? 'GEMINI' : a.plan ? 'OFFLINE' : null;
+  const sourceLabel = aiSourceLabel(a.plan);
 
   let body;
   if (voice.listening) {
