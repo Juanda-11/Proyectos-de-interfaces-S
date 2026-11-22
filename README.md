@@ -13,12 +13,12 @@ Aplicación **solo para smartwatch** pensada para trabajadores de planta: muestr
 
 ## Qué hace
 
-| Pantalla             | Descripción                                                                                                                                                                                          |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1 · Dashboard**    | Hora, batería real, anillo del turno (tiempo restante en tiempo real) y equipo asignado. **Toca el anillo o el equipo para configurarlos.**                                                          |
-| **2 · Alerta IA**    | Borde pulsante, vibración según severidad (media / alta / crítica) y botones gigantes **ACEPTAR** / **REPORTAR**.                                                                                    |
-| **3 · Asistente IA** | Plan de reparación paso a paso **hablado**. Admite **preguntas o la descripción de otro problema por voz o texto** ("la prensa hace un ruido metálico") y responde por voz.                          |
-| **Configuración**    | Tipo de equipo (10 tipos, varios sectores), número y nombre, turno (estándar, mañana, tarde, noche o personalizado, incluso nocturno), simulación automática de fallas y voz on/off. Se guarda sola. |
+| Pantalla             | Descripción                                                                                                                                                                                      |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **1 · Dashboard**    | Hora, batería real, anillo del turno (tiempo restante en tiempo real) y equipo asignado. **Toca el anillo o el equipo para configurarlos.**                                                      |
+| **2 · Alerta IA**    | Borde pulsante, vibración según severidad (media / alta / crítica) y botones gigantes **ACEPTAR** / **REPORTAR**.                                                                                |
+| **3 · Asistente IA** | Plan de reparación paso a paso **hablado**. Admite **preguntas o la descripción de otro problema por voz o texto** ("la prensa hace un ruido metálico") y responde por voz.                      |
+| **Configuración**    | Tipo de equipo (9 tipos de 4 sectores), número y nombre, turno (estándar, mañana, tarde, noche o personalizado, incluso nocturno), simulación automática de fallas y voz on/off. Se guarda sola. |
 
 ### Simulación (no hay máquina conectada)
 
